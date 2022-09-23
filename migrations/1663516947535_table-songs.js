@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
@@ -30,7 +28,6 @@ exports.up = (pgm) => {
     },
     albumId: {
       type: 'TEXT',
-      notNull: true,
     },
   });
 };
