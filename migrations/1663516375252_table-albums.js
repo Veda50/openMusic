@@ -14,6 +14,9 @@ exports.up = (pgm) => {
       type: 'INT',
       notNull: true,
     },
+    cover: {
+      type: 'VARCHAR(100)',
+    },
   });
 };
 
