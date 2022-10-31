@@ -24,7 +24,7 @@ const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
 
-const Collaborations = require('./api/collaborations');
+const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsServices');
 const CollaborationsValidator = require('./validator/collaborations');
 
@@ -68,51 +68,52 @@ const init = async () => {
     }),
   });
 
-  await server.register([{
-    plugin: albums,
-    options: {
-      service: albumsService,
-      validator: AlbumsValidator,
+  await server.register([
+    {
+      plugin: albums,
+      options: {
+        service: albumsService,
+        validator: AlbumsValidator,
+      },
     },
-  },
-  {
-    plugin: songs,
-    options: {
-      service: songsService,
-      validator: SongsValidator,
+    {
+      plugin: songs,
+      options: {
+        service: songsService,
+        validator: SongsValidator,
+      },
     },
-  },
-  {
-    plugin: users,
-    options: {
-      service: usersService,
-      validator: UsersValidator,
+    {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UsersValidator,
+      },
     },
-  },
-  {
-    plugin: authentications,
-    options: {
-      authenticationsService,
-      usersService,
-      tokenManager: TokenManager,
-      validator: AuthenticationsValidator,
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
+      },
     },
-  },
-  {
-    plugin: playlists,
-    options: {
-      service: playlistsService,
-      validator: PlaylistsValidator,
+    {
+      plugin: playlists,
+      options: {
+        service: playlistsService,
+        validator: PlaylistsValidator,
+      },
     },
-  },
-  {
-    plugin: Collaborations,
-    options: {
-      collaborationsService,
-      playlistsService,
-      validator: CollaborationsValidator,
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        playlistsService,
+        validator: CollaborationsValidator,
+      },
     },
-  },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
