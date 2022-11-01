@@ -18,7 +18,7 @@ class UsersService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (result.rows.length) {
       throw new InvariantError('Gagal menambahkan user. Username sudah digunakan!');
     }
   }

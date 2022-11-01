@@ -1,6 +1,3 @@
-const NotFoundError = require('../../exceptions/NotFoundError');
-const AuthorizationError = require('../../exceptions/AuthorizationError');
-
 class PlaylistHandler {
   constructor(service, validator) {
     this._service = service;
@@ -66,7 +63,8 @@ class PlaylistHandler {
 
   async postPlaylistSongHandler(request, h) {
     this._validator.validatePlaylistSongPayload(request.payload);
-    const { songId, playlistId } = request.params;
+    const { playlistId } = request.params;
+    const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
@@ -84,7 +82,7 @@ class PlaylistHandler {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._verifyPlaylistAccess(playlistId, credentialId);
+    await this._service.verifyPlaylistAccess(playlistId, credentialId);
     const playlist = await this._service.getSongsFromPlaylist(playlistId);
 
     return h.response({
@@ -96,7 +94,8 @@ class PlaylistHandler {
   }
 
   async deletePlaylistSongByIdHandler(request, h) {
-    const { playlistId, songId } = request.params;
+    const { playlistId } = request.params;
+    const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
@@ -123,37 +122,6 @@ class PlaylistHandler {
 
     response.code(200);
     return response;
-  }
-
-  async verifyPlaylistOwner(playlistId, userId) {
-    const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
-      values: [playlistId],
-    };
-    const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Playlist not found');
-    }
-    const playlist = result.rows[0];
-    if (playlist.owner !== userId) {
-      throw new AuthorizationError('You don\'t have the right to access this resource');
-    }
-  }
-
-  async verifyPlaylistAccess(playlistId, userId) {
-    try {
-      await this.verifyPlaylistOwner(playlistId, userId);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw error;
-      }
-      try {
-        await this._collaborationService.verifyCollaborator(playlistId, userId);
-      } catch {
-        throw error;
-      }
-    }
   }
 }
 
