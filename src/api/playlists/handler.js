@@ -53,7 +53,7 @@ class PlaylistHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistOwner(id, credentialId);
-    await this._service.deletePlaylistById(id);
+    await this._service.deletePlaylistById(id, credentialId);
 
     return h.response({
       status: 'success',
@@ -113,7 +113,7 @@ class PlaylistHandler {
     const { id: credentalId } = request.auth.credentials;
 
     await this._service.verifyPlaylistAccess(id, credentalId);
-    const activities = await this._service.getplaylistActivities(id);
+    const activities = await this._service.getPlaylistActivities(id);
 
     const response = h.response({
       status: 'success',

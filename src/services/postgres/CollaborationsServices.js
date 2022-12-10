@@ -5,8 +5,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addCollaboration(playlistId, userId) {
@@ -15,7 +16,7 @@ class CollaborationsService {
       values: [userId],
     });
 
-    if (!user.rows.lenght) {
+    if (!user.rows.length) {
       throw new NotFoundError('User tidak ditemukan');
     }
 
@@ -27,23 +28,25 @@ class CollaborationsService {
     if (!result.rows.length) {
       throw new InvariantError('Kolaborasi gagal ditambahkan');
     }
+    await this._cacheService.delete(`playlist-${userId}`);
     return result.rows[0].id;
   }
 
   async deleteCollaboration(playlistId, userId) {
     const result = await this._pool.query({
-      text: 'DELETE FROM collaborations WHERE playlist_id =$1 && user_id =$2 RETURNING id',
+      text: 'DELETE FROM collaborations WHERE playlist_id =$1 AND user_id =$2 RETURNING id',
       values: [playlistId, userId],
     });
 
-    if (!result.rows.length) {
+    if (result.rowCount === 0) {
       throw new InvariantError('Kolaborasi gagal dihapus');
     }
+    await this._cacheService.delete(`playlist-${userId}`);
   }
 
   async verifyCollaborator(playlistId, userId) {
     const result = await this._pool.query({
-      text: 'SELECT * FROM collaborations WHERE playlist_id = $1 && user_id =$2',
+      text: 'SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id =$2',
       values: [playlistId, userId],
     });
 

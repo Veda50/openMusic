@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
@@ -21,7 +19,7 @@ exports.up = (pgm) => {
       notNull: true,
     },
     action: {
-      type: 'VARCHAR(10)',
+      type: 'VARCHAR(50)',
       notNull: true,
     },
     time: {
